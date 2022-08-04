@@ -1,0 +1,123 @@
+ <div class="container">
+  <img id="img" src="https://bipbap.ru/wp-content/uploads/2017/05/0_15a1ca_7d6d6585_-1-L.jpg" width="500" height="375" />
+  <canvas id="myCanvasImg" width="500" height="375"></canvas>
+  <canvas id="myCanvas" width="500" height="375"></canvas>
+</div>
+<button id="change">Change modd</button>
+<script>
+  const canvas = document.getElementById("myCanvas"),
+    context = canvas.getContext("2d"),
+    canvasImg = document.getElementById("myCanvasImg"),
+    buttonChange = document.getElementById("change"),
+    contextImg = canvasImg.getContext("2d"),
+    img = document.getElementById("img");
+
+  img.onload = function() {
+    contextImg.drawImage(img, 0, 0, 500, 375);
+  };
+
+  let w = canvas.width,
+    h = canvas.height,
+    mode = "eraser"
+
+  contextImg.width = w
+  contextImg.height = h
+        
+  let mouse = { x:0, y:0};
+  let draw = false;
+  context.strokeStyle = "rgba(0, 0, 0, 1)";
+  context.lineWidth = 10;
+
+  buttonChange.addEventListener("click", function(e){
+    console.log(mode)
+    if(mode==="eraser") {
+      mode = "restore"
+    } else if(mode==="restore") {
+      mode = "eraser"
+    }
+  })
+
+  canvas.addEventListener("mousedown", function(e){
+    draw = true;
+  });
+  canvas.addEventListener("mousemove", function(e){  
+    if(draw==true){  
+      if(mode=="restore") {
+        context.globalCompositeOperation = "destination-out";
+      }
+      let ClientRect = this.getBoundingClientRect();
+
+      mouse.x = e.pageX - ClientRect.left;
+      mouse.y = e.pageY - ClientRect.top;
+
+      context.beginPath();
+      context.moveTo(mouse.x, mouse.y);
+
+      context.arc(mouse.x, mouse.y, 10, 0, Math.PI * 2, false)
+      context.fill()
+      context.closePath()
+      associationCanvas()
+      context.globalCompositeOperation = "source-over";
+    }
+  });
+  canvas.addEventListener("mouseup", function(e){
+    draw = false;
+  });
+  function associationCanvas() {
+    contextImg.drawImage(img, 0, 0, 500, 375);
+    contextImg.globalCompositeOperation = "destination-out";
+    contextImg.drawImage(canvas, 0, 0, 500, 375);
+    contextImg.globalCompositeOperation = "source-over";
+  }
+</script>
+<style>
+  body {
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background-position: 0px 0px, 20px 20px;
+      background-size: 40px 40px;
+      background-image: linear-gradient(
+          45deg,
+          #eee 25%,
+          transparent 25%,
+          transparent 75%,
+          #eee 75%,
+          #eee 100%
+        ),
+        linear-gradient(
+          45deg,
+          #eee 25%,
+          white 25%,
+          white 75%,
+          #eee 75%,
+          #eee 100%
+        );
+  }
+  .container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #myCanvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+  }
+  #myCanvasImg {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  #change {
+    margin-top: 15px;
+  }
+  #img {
+    opacity: 0;
+  }
+</style>
